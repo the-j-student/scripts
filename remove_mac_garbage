@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Script to recursively remove all files and directories starting with ._
+# Common use case: cleaning up macOS metadata files
+
+# Set the starting directory (default to current directory if not provided)
+START_DIR="${1:-.}"
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "Starting cleanup of ._ files and directories in: $START_DIR"
+echo "=================================================="
+
+# Counter for removed items
+removed_count=0
+
+# Find and remove all files and directories starting with ._
+while IFS= read -r -d '' item; do
+    if [[ -e "$item" ]]; then
+        echo -e "${YELLOW}Removing:${NC} $item"
+        rm -rf "$item"
+        if [[ $? -eq 0 ]]; then
+            ((removed_count++))
+        else
+            echo -e "${RED}Failed to remove:${NC} $item"
+        fi
+    fi
+done < <(find "$START_DIR" -name "._*" -print0)
+
+echo "=================================================="
+echo -e "${GREEN}Cleanup complete!${NC} Removed $removed_count item(s)."
